@@ -15,10 +15,25 @@ def setup_retriever():
     # Load the documents from each URL
 
     docs = [WebBaseLoader(url).load() for url in urls]
+    docs_list = [item for sublist in docs for item in sublist]
 
-    print(docs[0][0].metadata)
+    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=100,
+                                                                         chunk_overlap=50)
 
-    return docs
+    doc_splits = text_splitter.split_documents(docs_list)
+
+    vectorstore = Chroma.from_documents(
+        documents=doc_splits,
+        collection_name="rag-chroma",
+        embedding=OpenAIEmbeddings(),
+    )
+
+    retriever = vectorstore.as_retriever()
 
 
-setup_retriever()
+    return create_retriever_tool(
+        retriever,
+        "retrieve_blog_posts",
+        "Pesquise e retorne informações sobre cursos da Scoras Academy e serviços da Scoras, que são duas empresas diferentes"
+    )
+

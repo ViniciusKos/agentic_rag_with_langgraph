@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from config import load_config
 import pprint
-
+from retriever.tools import setup_retriever
 
 def initialize_environment() -> Dict[str, Any]:
     return load_config()
@@ -25,4 +25,12 @@ def process_output(output: Dict[str, Any]) -> None:
 def main():
     config = initialize_environment()
     print("Configurations loaded:")
+
+    # Set up the retriever and the tools
+
+    retriever_tool = setup_retriever()
+    tools = [retriever_tool]
+    
+    # create the workflow
+
     
