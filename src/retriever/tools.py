@@ -34,6 +34,6 @@ def setup_retriever():
     return create_retriever_tool(
         retriever,
         "retrieve_blog_posts",
-        "Pesquise e retorne informações sobre cursos da Scoras Academy e serviços da Scoras, que são duas empresas diferentes"
+        "Search and return information about courses from Scoras Academy and services from Scoras, which are two different companies."
     )
 
