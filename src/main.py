@@ -3,6 +3,7 @@ from config import load_config
 import pprint
 from retriever.tools import setup_retriever
 from agent.graph import create_workflow
+from langgraph.prebuilt.chat_agent_executor import AgentState
 
 def initialize_environment() -> Dict[str, Any]:
     return load_config()
@@ -33,7 +34,7 @@ def main():
     tools = [retriever_tool]
     
     # create the workflow
-    graph = create_workflow(agent_state=config, tools=tools)
+    graph = create_workflow(agent_state=AgentState, tools=tools)
     
     print("\nRAG Agentic initialized and ready to answer questions!")
     print("Type 'exit' to terminate the program.")

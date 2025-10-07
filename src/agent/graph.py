@@ -3,18 +3,38 @@ from langgraph.prebuilt import ToolNode, tools_condition
 
 def create_workflow(agent_state, tools):
     """Create a workflow graph for the agent using the provided tools."""
-    graph = StateGraph()
 
-    # Define the start and end nodes
-    graph.add_node(START)
-    graph.add_node(END)
+    from .nodes import agent, analyze_documents, rewrite, generate
 
-    # Add a tool node to the graph
-    tool_node = ToolNode("tool_node", tools=tools, state=agent_state)
-    graph.add_node(tool_node)
 
-    # Define the transitions between nodes
-    graph.add_edge(START, tool_node)
-    graph.add_edge(tool_node, END, condition=tools_condition(tool_node))
+    workflow = StateGraph(agent_state)
 
-    return graph
+    # Define nodes
+    workflow.add_node("agent", lambda state: agent(state, tools))
+    retrieve_node = ToolNode(tools)
+    workflow.add_node("retrieve", retrieve_node)
+    workflow.add_node("rewrite", rewrite)
+    workflow.add_node("generate", generate)
+
+    #Define the edges
+    workflow.add_edge(START, "agent")
+
+    workflow.add_conditional_edges("agent", 
+                                  tools_condition,
+                                  {"tools": "retrieve",
+                                   END: END,
+                                   },
+                                   )
+
+    # Edges after retrieval
+    workflow.add_conditional_edges("retrieve", 
+                                  analyze_documents,
+                                    {"generate": "generate",
+                                     "rewrite": "rewrite",
+                                     },
+                                     )
+
+    workflow.add_edge("generate", END)
+    workflow.add_edge("rewrite", "agent")
+
+    return workflow.compile()
