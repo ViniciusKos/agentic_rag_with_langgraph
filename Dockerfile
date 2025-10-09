@@ -3,7 +3,7 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install uv with pip install --no-cache-dir ti redyce suze
-RUN pip install --no-cache-dir -uv
+RUN pip install --no-cache-dir uv
 
 # Copy requirements file
 COPY requirements.txt .
